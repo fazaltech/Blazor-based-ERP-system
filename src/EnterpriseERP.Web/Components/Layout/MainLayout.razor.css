@@ -1,0 +1,8 @@
+.page { display: flex; min-height: 100vh; background: #f5f7fb; }
+.sidebar { width: 250px; flex: 0 0 250px; background: #142239; color: #d6e0ef; }
+main { flex: 1; min-width: 0; }
+.top-row { height: 68px; background: white; border-bottom: 1px solid #e6eaf1; display: flex; align-items: center; justify-content: space-between; font-weight: 600; }
+.content { max-width: 1500px; margin: auto; padding-top: 2.5rem; }
+@media (max-width: 760px) { .page { display: block; } .sidebar { width: 100%; } .top-row { height: 55px; } }
+.profile-menu { position: relative; }
+.profile-menu div { position: absolute; right: 0; top: 28px; z-index: 2; background: white; border: 1px solid #e6eaf1; border-radius: 8px; padding: 10px; min-width: 140px; box-shadow: 0 8px 20px #182d4a20; }

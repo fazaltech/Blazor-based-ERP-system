@@ -1,0 +1,17 @@
+<div class="brand"><span class="brand-mark">E</span><div><strong>Enterprise ERP</strong><small>Management workspace</small></div></div>
+<input type="checkbox" title="Toggle navigation" class="navbar-toggler" />
+<div class="nav-scrollable"><nav class="nav flex-column">
+    <p class="nav-section">WORKSPACE</p>
+    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">◫ &nbsp; Dashboard</NavLink>
+    <AuthorizeView Roles="SuperAdmin"><Authorized>
+        <p class="nav-section">PLATFORM ADMINISTRATION · PLANNED</p>
+        <NavLink class="nav-link" href="platform/tenants">Tenants</NavLink>
+        <span class="nav-placeholder">Users &amp; roles</span>
+        <span class="nav-placeholder">Subscriptions &amp; audit logs</span>
+    </Authorized></AuthorizeView>
+    <p class="nav-section">MODULES · PLANNED</p>
+    @foreach (var module in Modules) { <span class="nav-placeholder">@module</span> }
+</nav></div>
+@code {
+    private static readonly string[] Modules = ["Organization", "Financial accounting", "Management accounting", "Human resources", "Inventory", "Procurement", "Sales", "Manufacturing", "Projects", "CRM", "SRM", "Education", "Contracts", "Reports", "Settings"];
+}

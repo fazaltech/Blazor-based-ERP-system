@@ -1,0 +1,33 @@
+@page "/account/login"
+@layout AccountLayout
+@attribute [AllowAnonymous]
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Sign in | Enterprise ERP</PageTitle>
+<div class="login-card">
+    <div class="login-mark">E</div><p class="eyebrow">ENTERPRISE ERP</p>
+    <h1>Welcome back</h1><p class="text-secondary">Sign in to your workspace.</p>
+    @if (Error is not null) { <div class="alert alert-danger" role="alert">Invalid email or password.</div> }
+    <form method="post" action="/account/login/submit" data-enhance="false" id="login-form">
+        <AntiforgeryToken />
+        <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
+        <label for="email" class="form-label">Email address</label>
+        <input id="email" name="Email" type="email" class="form-control mb-3" required autocomplete="username" />
+        <label for="password" class="form-label">Password</label>
+        <input id="password" name="Password" type="password" class="form-control mb-3" required autocomplete="current-password" />
+        <div class="form-check mb-3"><input id="show-password" type="checkbox" class="form-check-input" /><label for="show-password" class="form-check-label">Show password</label></div>
+        <div class="form-check mb-4"><input id="remember" type="checkbox" name="RememberMe" value="true" class="form-check-input" /><label for="remember" class="form-check-label">Remember me</label></div>
+        <button type="submit" class="btn btn-primary w-100">Sign in</button>
+    </form>
+</div>
+@code {
+    [SupplyParameterFromQuery] public string? Error { get; set; }
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+    [CascadingParameter] public HttpContext? HttpContext { get; set; }
+    protected override void OnInitialized()
+    {
+        if (HttpContext?.User.Identity?.IsAuthenticated == true)
+            Navigation.NavigateTo(AccountEndpoints.SafeReturnUrl(ReturnUrl));
+    }
+}
