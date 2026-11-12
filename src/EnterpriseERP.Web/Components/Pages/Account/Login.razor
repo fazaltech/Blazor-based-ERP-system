@@ -8,6 +8,7 @@
 <div class="login-card">
     <div class="login-mark">E</div><p class="eyebrow">ENTERPRISE ERP</p>
     <h1>Welcome back</h1><p class="text-secondary">Sign in to your workspace.</p>
+    <p><a href="/account/register">Create account</a> · <a href="/account/forgot-password">Forgot password?</a></p>
     @if (Error is not null) { <div class="alert alert-danger" role="alert">Invalid email or password.</div> }
     <form method="post" action="/account/login/submit" data-enhance="false" id="login-form">
         <AntiforgeryToken />

@@ -1,0 +1,25 @@
+@page "/users"
+@attribute [Authorize(Policy = "UserDirectoryView")]
+@inject EnterpriseERP.Application.Users.UserService Service
+<PageTitle>User management</PageTitle>
+<h1>User management</h1><p>Approve registrations, manage platform access, or reset a verified user's password. Tenant business access is not granted here.</p>
+@if (Message is not null) { <div class="alert alert-info" role="status">@Message</div> }
+@if (Rows is null) { <p>Loading users…</p> } else {
+<div class="table-responsive"><table class="table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Roles</th><th>Permissions</th></tr></thead><tbody>
+@foreach(var user in Rows) { <tr><td>@user.Id</td><td>@user.Name</td><td>@user.Email</td><td>@(user.Active ? "Active" : "Inactive")</td><td>@user.Roles</td><td>@user.Permissions</td></tr> }
+</tbody></table></div><p>Showing up to 200 users.</p>
+<AuthorizeView Roles="SuperAdmin"><Authorized><form method="post" action="/users/manage" data-enhance="false" class="overview-card"><AntiforgeryToken />
+<label for="user">User</label><select id="user" name="Id" class="form-select mb-3">@foreach(var user in Rows) { <option value="@user.Id">@user.Email</option> }</select>
+<label for="action">Action</label><select id="action" name="Action" class="form-select mb-3"><option value="activate">Activate</option><option value="disable">Disable</option><option value="unlock">Unlock</option><option value="reset">Reset password</option><option value="role">Assign role</option><option value="remove-role">Remove role</option><option value="permission">Assign permission</option><option value="remove-permission">Remove permission</option></select>
+<label for="role">Role (for role actions)</label><select id="role" name="Role" class="form-select mb-3">@foreach(var role in new[] { "Employee", "TenantAdmin", "CompanyAdmin", "BranchManager", "DepartmentManager" }) { <option>@role</option> }</select>
+<label for="permission">Permission (for permission actions)</label><select id="permission" name="Permission" class="form-select mb-3"><option>platform.users.view</option></select>
+<label for="value">New password (only for reset)</label><input id="value" name="Value" type="password" class="form-control mb-3" autocomplete="new-password" />
+<p>Only the field associated with the selected action is used. Verify the person's identity before resetting a password.</p>
+<button type="submit" class="btn btn-primary">Apply change</button>
+</form></Authorized></AuthorizeView> }
+@code {
+ [CascadingParameter] public HttpContext? HttpContext { get; set; }
+ [SupplyParameterFromQuery] public string? Message { get; set; }
+ private IReadOnlyList<EnterpriseERP.Application.Users.UserRow>? Rows;
+ protected override async Task OnInitializedAsync() { if(HttpContext is not null) Rows = await Service.List(HttpContext.User); }
+}

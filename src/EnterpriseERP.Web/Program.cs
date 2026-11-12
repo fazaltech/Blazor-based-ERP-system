@@ -10,6 +10,7 @@ builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     options.AddPolicy("SuperAdminOnly", policy => policy.RequireRole("SuperAdmin"));
+    options.AddPolicy("UserDirectoryView", policy => policy.RequireAuthenticatedUser().RequireAssertion(c => c.User.IsInRole("SuperAdmin") || c.User.HasClaim("permission", "platform.users.view")));
     foreach (var role in new[] { "TenantAdmin", "CompanyAdmin", "BranchManager", "DepartmentManager", "Employee" })
         options.AddPolicy(role + "Only", policy => policy.RequireRole(role));
 });
@@ -39,6 +40,7 @@ app.UseAuthorization();
 app.UseAntiforgery();
 app.MapStaticAssets().AllowAnonymous();
 app.MapAccountEndpoints();
+app.MapUserEndpoints();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.Run();
 

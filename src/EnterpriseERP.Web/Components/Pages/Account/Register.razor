@@ -1,0 +1,16 @@
+@page "/account/register"
+@layout AccountLayout
+@attribute [AllowAnonymous]
+<PageTitle>Create account</PageTitle>
+<div class="login-card"><h1>Create account</h1>
+<p>Your administrator must activate your account before you can sign in.</p>
+@if (Message is not null) { <div class="alert alert-info" role="status">@Message</div> }
+<form method="post" action="/account/register/submit" data-enhance="false"><AntiforgeryToken />
+<label for="name">Full name</label><input id="name" name="Name" class="form-control mb-3" required maxlength="160" autocomplete="name" />
+<label for="email">Email</label><input id="email" name="Email" type="email" class="form-control mb-3" required maxlength="254" autocomplete="email" />
+<label for="password">Password</label><input id="password" name="Password" type="password" class="form-control mb-3" required minlength="8" autocomplete="new-password" />
+<label for="confirm">Confirm password</label><input id="confirm" name="ConfirmPassword" type="password" class="form-control mb-3" required autocomplete="new-password" />
+<p>Use at least eight characters with uppercase, lowercase, a number and a symbol.</p>
+<button class="btn btn-primary" type="submit">Create account</button> <a href="/account/login">Sign in</a>
+</form></div>
+@code { [SupplyParameterFromQuery] public string? Message { get; set; } }

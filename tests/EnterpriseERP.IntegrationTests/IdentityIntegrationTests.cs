@@ -211,4 +211,33 @@ public class IdentityIntegrationTests
         Assert.True(match.Success, "Antiforgery token was not rendered.");
         return WebUtility.HtmlDecode(match.Groups[1].Value);
     }
+
+    [IdentityDatabaseFact]
+    public async Task UserModuleRegistrationApprovalRolesPermissionsAndReset()
+    {
+        using var app = CreateApp();
+        await using var scope = app.Services.CreateAsyncScope();
+        var service = scope.ServiceProvider.GetRequiredService<EnterpriseERP.Application.Users.UserService>();
+        var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var admin = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.Role, "SuperAdmin")], "test"));
+        var email = $"registration-{Guid.NewGuid():N}@example.test";
+        var password = "Test!" + Guid.NewGuid().ToString("N") + "8a";
+        Assert.Null(await service.Register(email, "Registration test", password));
+        var user = (await users.FindByEmailAsync(email))!;
+        Assert.False(user.IsActive);
+        Assert.NotNull(await service.Register(email, "Duplicate", password));
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => service.Manage(new ClaimsPrincipal(), user.Id, "activate", ""));
+        Assert.Null(await service.Manage(admin, user.Id, "activate", ""));
+        Assert.Null(await service.Manage(admin, user.Id, "role", "Employee"));
+        Assert.Null(await service.Manage(admin, user.Id, "permission", "platform.users.view"));
+        Assert.True(await users.IsInRoleAsync(user, "Employee"));
+        Assert.Contains(await users.GetClaimsAsync(user), c => c.Type == "permission" && c.Value == "platform.users.view");
+        Assert.NotNull(await service.Manage(admin, user.Id, "role", "SuperAdmin"));
+        var replacement = "Replacement!" + Guid.NewGuid().ToString("N") + "9b";
+        Assert.Null(await service.Manage(admin, user.Id, "reset", replacement));
+        Assert.True(await users.CheckPasswordAsync(user, replacement));
+        Assert.False(await users.CheckPasswordAsync(user, password));
+        Assert.Null(await service.Manage(admin, user.Id, "disable", ""));
+        Assert.False(user.IsActive);
+    }
 }

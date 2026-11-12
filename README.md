@@ -1,6 +1,14 @@
 # Enterprise ERP
 
-This .NET 10 Blazor Interactive Server solution connects to an existing PostgreSQL ERP database. It is an **unfinished, non-production foundation**: tenant isolation, tenant-aware roles and permissions, user management, and ERP workflows are not implemented. The dashboard and platform tenant page contain placeholders and do not expose ERP records.
+This .NET 10 Blazor Interactive Server solution connects to an existing PostgreSQL ERP database. It remains a non-production foundation: tenant isolation, tenant-scoped authorization and ERP workflows are not implemented. The dashboard and platform tenant page do not expose ERP business records.
+
+## Local user management
+
+Registration at `/account/register` creates an inactive account with no roles. A SuperAdmin approves it at `/users`. The directory shows up to 200 users, roles and direct permissions. Administrators can activate, disable, unlock, reset passwords, assign/remove supported roles, and assign/remove `platform.users.view` for read-only directory access. These operations invalidate existing authentication cookies. The protected bootstrap administrator cannot be modified from this page.
+
+No email is sent. `/account/forgot-password` directs users to an administrator, who must verify identity before setting a replacement password. It does not issue public reset tokens. New user-module pages and HTTP endpoints call `UserService` in Application, which calls `IUserRepository`; Infrastructure implements that repository using Identity managers and EF models. Existing login/logout endpoints still use Identity managers directly. No schema migration is needed for these additions.
+
+This is not a complete lifecycle module yet: self-service profile/password changes, auditable recovery requests, searchable pagination, and custom role/permission catalogs remain outstanding. Tenant role labels assigned here are platform Identity roles and do not authorize tenant business data.
 
 ## Run locally
 

@@ -34,6 +34,8 @@ public static class DependencyInjection
             options.User.RequireUniqueEmail = true;
         }).AddEntityFrameworkStores<ApplicationIdentityDbContext>().AddDefaultTokenProviders();
         services.AddScoped<IdentityDataSeeder>();
+        services.AddScoped<EnterpriseERP.Application.Users.IUserRepository, UserRepository>();
+        services.AddScoped<EnterpriseERP.Application.Users.UserService>();
         services.ConfigureApplicationCookie(options =>
         {
             options.LoginPath = "/account/login";
